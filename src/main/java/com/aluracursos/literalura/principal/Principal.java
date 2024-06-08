@@ -1,8 +1,13 @@
 package com.aluracursos.literalura.principal;
 
+import com.aluracursos.literalura.model.Datos;
+import com.aluracursos.literalura.model.DatosLibros;
 import com.aluracursos.literalura.service.ConsumoAPI;
 import com.aluracursos.literalura.service.ConvierteDatos;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Principal {
@@ -12,7 +17,6 @@ public class Principal {
   private static final String URL_BASE = "https://gutendex.com/books/";
 
   public void muestraMenu() {
-    var json = consumoAPI.obtenerDatos(URL_BASE);
     var opcion = -1;
 
     while (opcion != 0) {
@@ -33,10 +37,58 @@ public class Principal {
         case 0:
           System.out.println("Cerrando la aplicación...");
           break;
+        case 1:
+          buscarLibroPorTitulo();
+          break;
+        case 5:
+          mostrarLibrosPorIdioma();
+          break;
         default:
           System.out.println("Opción invalida");
       }
     }
 
+  }
+
+  private void buscarLibroPorTitulo() {
+    System.out.println("Ingrese el titulo del libro a buscar");
+    var tituloLibro = teclado.nextLine();
+    var json = consumoAPI.obtenerDatos(URL_BASE + "?search=" + tituloLibro.replace(" ","+"));
+    var datosBusqueda = conversor.obtenerDatos(json, Datos.class);
+    Optional<DatosLibros> libroBuscado = datosBusqueda.resultados().stream()
+        .filter(l -> l.titulo().toUpperCase().contains(tituloLibro.toUpperCase()))
+        .findFirst();
+    if(libroBuscado.isPresent()){
+      System.out.println("Libro Encontrado ");
+      System.out.println(libroBuscado.get());
+    } else {
+      System.out.println("Libro no encontrado");
+    }
+  }
+
+  private void mostrarLibrosPorIdioma() {
+    String listadoIdiomas = """
+        *** CÓDIGOS DE IDIOMA ***
+        Español -> es
+        Inglés -> en
+        Portugués -> pt
+        Francés -> fr
+        Italiano -> it
+        """;
+    System.out.println(listadoIdiomas);
+    System.out.println("¿Cuál es el idioma que desea buscar?");
+    var idioma = teclado.nextLine();
+    var json = consumoAPI.obtenerDatos(URL_BASE + "?languages=" + idioma.toLowerCase());
+    var datosBusqueda = conversor.obtenerDatos(json, Datos.class);
+
+    Optional<DatosLibros> idiomaBuscado = datosBusqueda.resultados().stream()
+        .filter(l -> l.idioma().contains(idioma.toLowerCase()))
+        .findFirst();
+    if(idiomaBuscado.isPresent()){
+      System.out.println("Libros econtrados en el idioma \'" + idioma + "\'");
+      System.out.println(idiomaBuscado.get());
+    } else {
+      System.out.println("Idioma no encontrado");
+    }
   }
 }
