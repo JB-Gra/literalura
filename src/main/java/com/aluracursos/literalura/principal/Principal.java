@@ -5,7 +5,6 @@ import com.aluracursos.literalura.model.DatosLibros;
 import com.aluracursos.literalura.service.ConsumoAPI;
 import com.aluracursos.literalura.service.ConvierteDatos;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -22,6 +21,7 @@ public class Principal {
 
     while (opcion != 0) {
       String menu = """
+        *** LITERALURA ***
         Elija la opción deseada:
         1 - Buscar y registrar libro por titulo
         2 - Mostrar libros registrados
@@ -35,24 +35,29 @@ public class Principal {
       teclado.nextLine();
 
       switch (opcion) {
-        case 0:
-          System.out.println("Cerrando la aplicación...");
-          break;
         case 1:
           buscarLibroPorTitulo();
           break;
+        case 3:
+          buscarAutoresRegistrados();
+          break;
+        case 4:
+          mostrarAutoresVivosEnUnaEpoca();
+          break;
         case 5:
           mostrarLibrosPorIdioma();
+          break;
+        case 0:
+          System.out.println("Cerrando la aplicación...");
           break;
         default:
           System.out.println("Opción invalida");
       }
     }
-
   }
 
   private void buscarLibroPorTitulo() {
-    System.out.println("Ingrese el titulo del libro a buscar");
+    System.out.println("Ingrese el titulo del libro a buscar:");
     var tituloLibro = teclado.nextLine();
     var json = consumoAPI.obtenerDatos(URL_BASE + "?search=" + tituloLibro.replace(" ","+"));
     var datosBusqueda = conversor.obtenerDatos(json, Datos.class);
@@ -85,22 +90,21 @@ public class Principal {
     if (idiomaCodigo.length() == 2) {
       List<DatosLibros> librosEnIdioma = datosBusqueda.resultados().stream()
           .filter(l -> l.idioma().contains(idiomaCodigo.toLowerCase()))
+          .limit(10)
           .collect(Collectors.toList());
 
       librosEnIdioma.forEach(System.out::println);
     } else {
       System.out.println("Idioma no encontrado");
     }
+  }
 
-//    Optional<DatosLibros> idiomaBuscado = datosBusqueda.resultados().stream()
-//        .filter(l -> l.idioma().contains(idiomaCodigo.toLowerCase()))
-//        .findFirst();
+  private void buscarAutoresRegistrados() {
+    System.out.println("Ingrese el nombre del autor que desee buscar:");
+  }
 
-//    if(idiomaBuscado.isPresent()){
-//      System.out.println("Libros econtrados en el idioma \'" + idioma + "\'");
-//      System.out.println(idiomaBuscado.get());
-//    } else {
-//      System.out.println("Idioma no encontrado");
-//    }
+  private void mostrarAutoresVivosEnUnaEpoca() {
+    System.out.println("Escriba el año que desee buscar:");
+    var fechaDeVida = teclado.nextInt();
   }
 }
