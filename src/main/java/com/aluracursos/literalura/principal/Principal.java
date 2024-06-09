@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
   private ConsumoAPI consumoAPI = new ConsumoAPI();
@@ -77,18 +78,29 @@ public class Principal {
         """;
     System.out.println(listadoIdiomas);
     System.out.println("¿Cuál es el idioma que desea buscar?");
-    var idioma = teclado.nextLine();
-    var json = consumoAPI.obtenerDatos(URL_BASE + "?languages=" + idioma.toLowerCase());
+    var idiomaCodigo = teclado.nextLine();
+    var json = consumoAPI.obtenerDatos(URL_BASE + "?languages=" + idiomaCodigo.toLowerCase());
     var datosBusqueda = conversor.obtenerDatos(json, Datos.class);
 
-    Optional<DatosLibros> idiomaBuscado = datosBusqueda.resultados().stream()
-        .filter(l -> l.idioma().contains(idioma.toLowerCase()))
-        .findFirst();
-    if(idiomaBuscado.isPresent()){
-      System.out.println("Libros econtrados en el idioma \'" + idioma + "\'");
-      System.out.println(idiomaBuscado.get());
+    if (idiomaCodigo.length() == 2) {
+      List<DatosLibros> librosEnIdioma = datosBusqueda.resultados().stream()
+          .filter(l -> l.idioma().contains(idiomaCodigo.toLowerCase()))
+          .collect(Collectors.toList());
+
+      librosEnIdioma.forEach(System.out::println);
     } else {
       System.out.println("Idioma no encontrado");
     }
+
+//    Optional<DatosLibros> idiomaBuscado = datosBusqueda.resultados().stream()
+//        .filter(l -> l.idioma().contains(idiomaCodigo.toLowerCase()))
+//        .findFirst();
+
+//    if(idiomaBuscado.isPresent()){
+//      System.out.println("Libros econtrados en el idioma \'" + idioma + "\'");
+//      System.out.println(idiomaBuscado.get());
+//    } else {
+//      System.out.println("Idioma no encontrado");
+//    }
   }
 }
