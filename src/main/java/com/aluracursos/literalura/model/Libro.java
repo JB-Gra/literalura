@@ -1,14 +1,19 @@
 package com.aluracursos.literalura.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-
 import java.util.List;
 
 public class Libro {
   private String titulo;
   private List<DatosAutor> autor;
   private List<String> idioma;
-  private Double numeroDescarga;
+  private Integer numeroDescarga;
+
+  public Libro(String titulo, DatosLibros l) {
+    this.titulo = l.titulo();
+    this.autor = l.autor();
+    this.idioma = l.idioma();
+    this.numeroDescarga = Integer.valueOf(l.numeroDescargas());
+  }
 
   public String getTitulo() {
     return titulo;
@@ -34,11 +39,22 @@ public class Libro {
     this.idioma = idioma;
   }
 
-  public Double getNumeroDescarga() {
+  public Integer getNumeroDescarga() {
     return numeroDescarga;
   }
 
-  public void setNumeroDescarga(Double numeroDescarga) {
+  public void setNumeroDescarga(Integer numeroDescarga) {
     this.numeroDescarga = numeroDescarga;
+  }
+
+  @Override
+  public String toString() {
+    return
+        "----- LIBRO -----" +
+        "\nTitulo: " + titulo +
+        "\nAutor: " + autor.get(0).nombre() +
+        "\nIdioma: " + idioma.get(0) +
+        "\nNúmero de descargas: " + numeroDescarga +
+        "\n-----------------\n";
   }
 }

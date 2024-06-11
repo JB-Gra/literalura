@@ -2,6 +2,7 @@ package com.aluracursos.literalura.principal;
 
 import com.aluracursos.literalura.model.Datos;
 import com.aluracursos.literalura.model.DatosLibros;
+import com.aluracursos.literalura.model.Libro;
 import com.aluracursos.literalura.service.ConsumoAPI;
 import com.aluracursos.literalura.service.ConvierteDatos;
 
@@ -38,15 +39,15 @@ public class Principal {
         case 1:
           buscarLibroPorTitulo();
           break;
-        case 3:
-          buscarAutoresRegistrados();
-          break;
-        case 4:
-          mostrarAutoresVivosEnUnaEpoca();
-          break;
-        case 5:
-          mostrarLibrosPorIdioma();
-          break;
+//        case 3:
+//          buscarAutoresRegistrados();
+//          break;
+//        case 4:
+//          mostrarAutoresVivosEnUnaEpoca();
+//          break;
+//        case 5:
+//          mostrarLibrosPorIdioma();
+//          break;
         case 0:
           System.out.println("Cerrando la aplicación...");
           break;
@@ -60,51 +61,75 @@ public class Principal {
     System.out.println("Ingrese el titulo del libro a buscar:");
     var tituloLibro = teclado.nextLine();
     var json = consumoAPI.obtenerDatos(URL_BASE + "?search=" + tituloLibro.replace(" ","+"));
-    var datosBusqueda = conversor.obtenerDatos(json, Datos.class);
-    Optional<DatosLibros> libroBuscado = datosBusqueda.resultados().stream()
+    var datos = conversor.obtenerDatos(json, Datos.class);
+    // System.out.println(datos);
+
+    Optional<DatosLibros> libroBuscado = datos.resultados().stream()
         .filter(l -> l.titulo().toUpperCase().contains(tituloLibro.toUpperCase()))
         .findFirst();
-    if(libroBuscado.isPresent()){
-      System.out.println("Libro Encontrado ");
-      System.out.println(libroBuscado.get());
+
+    if (libroBuscado.isPresent()) {
+      System.out.println("Libro encontrado\n");
+      List<Libro> libro = datos.resultados().stream()
+          .map(l -> new Libro(l.titulo(), l))
+          .limit(1)
+          .collect(Collectors.toList());
+
+      libro.forEach(System.out::println);
     } else {
       System.out.println("Libro no encontrado");
     }
+
+//    if(libroBuscado.isPresent()){
+//      System.out.println("Libro encontrado ");
+//      System.out.println(libroBuscado.get());
+//    } else {
+//      System.out.println("Libro no encontrado");
+//    }
   }
 
-  private void mostrarLibrosPorIdioma() {
-    String listadoIdiomas = """
-        *** CÓDIGOS DE IDIOMA ***
-        Español -> es
-        Inglés -> en
-        Portugués -> pt
-        Francés -> fr
-        Italiano -> it
-        """;
-    System.out.println(listadoIdiomas);
-    System.out.println("¿Cuál es el idioma que desea buscar?");
-    var idiomaCodigo = teclado.nextLine();
-    var json = consumoAPI.obtenerDatos(URL_BASE + "?languages=" + idiomaCodigo.toLowerCase());
-    var datosBusqueda = conversor.obtenerDatos(json, Datos.class);
-
-    if (idiomaCodigo.length() == 2) {
-      List<DatosLibros> librosEnIdioma = datosBusqueda.resultados().stream()
-          .filter(l -> l.idioma().contains(idiomaCodigo.toLowerCase()))
-          .limit(10)
-          .collect(Collectors.toList());
-
-      librosEnIdioma.forEach(System.out::println);
-    } else {
-      System.out.println("Idioma no encontrado");
-    }
-  }
-
-  private void buscarAutoresRegistrados() {
-    System.out.println("Ingrese el nombre del autor que desee buscar:");
-  }
-
-  private void mostrarAutoresVivosEnUnaEpoca() {
-    System.out.println("Escriba el año que desee buscar:");
-    var fechaDeVida = teclado.nextInt();
-  }
+//  private void buscarAutoresRegistrados() {
+//    System.out.println("Ingrese el nombre del autor que desee buscar:");
+//    var nombreAutor = teclado.nextLine();
+//    var json = consumoAPI.obtenerDatos(URL_BASE + "?search=" + nombreAutor.replace(" ","+"));
+//    var datosBusqueda = conversor.obtenerDatos(json, Datos.class);
+//
+//    List<DatosLibros> autorBuscado = datosBusqueda.resultados().stream()
+//        .filter(l -> l.autor().contains(nombreAutor))
+//        .collect(Collectors.toList());
+//
+//    autorBuscado.forEach(l -> System.out.println("Autor: " + l.autor() + "\'Libros: " + l.titulo()));
+//  }
+//
+//  private void mostrarAutoresVivosEnUnaEpoca() {
+//    System.out.println("Escriba el año que desee buscar:");
+//    var fechaDeVida = teclado.nextInt();
+//  }
+//
+//  private void mostrarLibrosPorIdioma() {
+//    String listadoIdiomas = """
+//        *** CÓDIGOS DE IDIOMA ***
+//        Español -> es
+//        Inglés -> en
+//        Portugués -> pt
+//        Francés -> fr
+//        Italiano -> it
+//        """;
+//    System.out.println(listadoIdiomas);
+//    System.out.println("¿Cuál es el idioma que desea buscar?");
+//    var idiomaCodigo = teclado.nextLine();
+//    var json = consumoAPI.obtenerDatos(URL_BASE + "?languages=" + idiomaCodigo.toLowerCase());
+//    var datosBusqueda = conversor.obtenerDatos(json, Datos.class);
+//
+//    if (idiomaCodigo.length() == 2) {
+//      List<DatosLibros> librosEnIdioma = datosBusqueda.resultados().stream()
+//          .filter(l -> l.idioma().contains(idiomaCodigo.toLowerCase()))
+//          .limit(10)
+//          .collect(Collectors.toList());
+//
+//      librosEnIdioma.forEach(System.out::println);
+//    } else {
+//      System.out.println("Idioma no encontrado");
+//    }
+//  }
 }
