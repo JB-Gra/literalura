@@ -47,13 +47,29 @@ public class Libro {
     this.numeroDescarga = numeroDescarga;
   }
 
+  public String getPrimerAutor() {
+    if (autor.isEmpty()) {
+      return "Anónimo";
+    } else {
+      return autor.get(0).nombre();
+    }
+  }
+
+  public String getPrimerIdioma() {
+    if (idioma.isEmpty()) {
+      return "Sin idioma";
+    } else {
+      return idioma.get(0);
+    }
+  }
+
   @Override
   public String toString() {
     return
         "----- LIBRO -----" +
         "\nTitulo: " + titulo +
-        "\nAutor: " + autor.get(0).nombre() +
-        "\nIdioma: " + idioma.get(0) +
+        "\nAutor: " + getPrimerAutor() +
+        "\nIdioma: " + getPrimerIdioma() +
         "\nNúmero de descargas: " + numeroDescarga +
         "\n-----------------\n";
   }
